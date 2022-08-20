@@ -86,7 +86,7 @@ class MyParser:
                 code = code.strip()
                 self.counter += 1
 
-                cur = {self.counter: {code: active_name}}
+                cur = {self.counter: (code, active_name)}
                 values.update(cur)
 
         self.names_and_codes.update(values)
@@ -107,25 +107,29 @@ class MyParser:
             print("Оберіть один із віріантів: ")
             print()
             for k, v in self.names_and_codes.items():
-                print(k, v)
+                print(f"{k} {v[1]} - Code: {v[0]}")
 
             print()
             variant = input(f"Ваш варіант (від 1 до {len(self.names_and_codes)}): ")
+            print()
+
             if not variant.isdigit():
                 print('Потрібне число!')
                 continue
             variant = int(variant)
+
+            if variant > len(self.names_and_codes):
+                print('Це забагато!')
+                continue
+
             if len(self.names_and_codes) >= variant > 0:
                 cur = self.names_and_codes[variant]
-                cur_code = list(cur)[0]
-                self.code = cur_code
+                self.code = cur[0]
 
             self._get_indexes_for_parsing()
             self._parse_content()
-            print()
 
-            key = str(list(cur)[0])
-            print(f"{cur[key]} - Code: {cur_code}")
+            print(f"{cur[1]} - Code: {cur[0]}")
 
             print()
             for k, v in self.data.items():
