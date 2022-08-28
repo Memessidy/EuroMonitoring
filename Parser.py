@@ -42,30 +42,39 @@ class MyParser:
         data_list = curr_content.split('\n')
 
         values = [i.strip() for i in data_list[9].split(' ') if i]
-        self.__data['NON-COMMERCIAL-LONG'] = values[0]
-        self.__data['NON-COMMERCIAL-Short'] = values[1]
+        self.__data['NON-COMMERCIAL LONG'] = values[0]
+        self.__data['NON-COMMERCIAL Short'] = values[1]
+        self.__data['NON-COMMERCIAL NET POSITIONS'] = str(int(values[0].replace(',', '')) -
+                                                          int(values[1].replace(',', '')))
         self.__data['SPREADS'] = values[2]
-        self.__data['COMMERCIAL-LONG'] = values[3]
-        self.__data['COMMERCIAL-SHORT'] = values[4]
-        self.__data['TOTAL-LONG'] = values[5]
-        self.__data['TOTAL-SHORT'] = values[6]
+        self.__data['COMMERCIAL LONG'] = values[3]
+        self.__data['COMMERCIAL SHORT'] = values[4]
+        self.__data['COMMERCIAL NET POSITIONS'] = str(int(values[3].replace(',', '')) -
+                                                      int(values[4].replace(',', '')))
+        self.__data['TOTAL LONG'] = values[5]
+        self.__data['TOTAL SHORT'] = values[6]
 
         values = [i.strip() for i in data_list[11].split(' ') if i]
-        self.__data['CHANGES-FROM'] = values[2]
+        self.__data['CHANGES FROM'] = values[2]
         self.__data['CHANGE IN OPEN INTEREST'] = values[-1].strip(')')
 
         values = [i.strip() for i in data_list[12].split(' ') if i]
-        self.__data['CHANGES-NON-COMMERCIAL-Long'] = values[0]
-        self.__data['CHANGES-NON-COMMERCIAL-Short'] = values[1]
-        self.__data['CHANGES-SPREADS'] = values[2]
-        self.__data['CHANGES-COMMERCIAL-LONG'] = values[3]
-        self.__data['CHANGES-COMMERCIAL-SHORT'] = values[4]
-        self.__data['CHANGES-TOTAL-LONG'] = values[5]
-        self.__data['CHANGES-TOTAL-SHORT'] = values[6]
+        self.__data['CHANGES NON-COMMERCIAL Long'] = values[0]
+        self.__data['CHANGES NON-COMMERCIAL Short'] = values[1]
+        self.__data['CHANGES SPREADS'] = values[2]
+        self.__data['CHANGES COMMERCIAL LONG'] = values[3]
+        self.__data['CHANGES COMMERCIAL SHORT'] = values[4]
+        self.__data['CHANGES TOTAL LONG'] = values[5]
+        self.__data['CHANGES TOTAL SHORT'] = values[6]
 
         self.__data = {k: self._make_formatted_number(v) for k, v in self.__data.items()}
 
     def _make_formatted_number(self, num: str):
+        negative = False
+
+        if '-' in num:
+            num = num.lstrip('-')
+            negative = True
 
         if "," in num:
             return num
@@ -75,7 +84,12 @@ class MyParser:
             else:
                 return num
 
-        return locale.format_string('%d', num, grouping=True)
+        if negative:
+            res = '-' + locale.format_string('%d', num, grouping=True)
+        else:
+            res = locale.format_string('%d', num, grouping=True)
+
+        return res
 
     def _get_names_and_codes(self):
         for i in self.__content.split('\n'):
