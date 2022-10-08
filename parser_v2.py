@@ -51,24 +51,23 @@ class Parser:
         return res
 
     def make_formatted_number(self, num: str):
-        negative = False
+        if '/' in num or '.' in num:
+            return num
 
-        if '-' in num:
+        negative = False
+        if '-' in num and ',' in num:
+            return num
+        elif '-' in num:
             num = num.lstrip('-')
             negative = True
 
-        if "," in num:
-            return num
+        if ',' in num:
+            res = num
         else:
-            if num.isdigit():
-                num = float(num)
-            else:
-                return num
+            res = locale.format_string('%d', int(num), grouping=True)
 
         if negative:
-            res = '-' + locale.format_string('%d', num, grouping=True)
-        else:
-            res = locale.format_string('%d', num, grouping=True)
+            res = '-' + str(res)
 
         return res
 
@@ -92,7 +91,7 @@ class Parser:
 
             index['Futures only positions as of'] = current_index[1].split()[-2]
             index['Open interest'] = current_index[7].split()[-1]
-            index['Contracts'] = ' '.join(current_index[7].split()[0:-3])
+            index['Unknown index'] = ' '.join(current_index[7].split()[0:-3])
 
             commitments = {}
             changes = {}
@@ -149,5 +148,8 @@ if __name__ == '__main__':
     links = (['https://www.cftc.gov/dea/futures/deacmesf.htm', 'https://www.cftc.gov/dea/futures/deacmxsf.htm'])
     f = Parser(links)
     f.refresh_all_data()
-    for i in f.data:
-        print(i)
+    # for i in f.data:
+    #     print(i)
+
+# pprint(f.data['GOLD - COMMODITY EXCHANGE INC. Code: 088691'])
+# pprint(f.data['E-MINI S&P ENERGY INDEX - CHICAGO MERCANTILE EXCHANGE Code: 138749'])
